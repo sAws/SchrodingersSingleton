@@ -1,0 +1,18 @@
+---
+- name: "Deploy docker gateway"
+  become: true
+  docker_container:
+    name: "{{ gateway_docker_name }}"
+    hostname: "{{ gateway_docker_name }}"
+    state: "started"
+    image: "{{ gateway_docker_image }}"
+    ports:
+      - "{{ gateway_docker_ports }}"
+    log_driver: "json-file"
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    restart_policy: "always"
+    env:
+      TZ: "Europe/Moscow"
+      GATEWAY_PORT: "{{ gateway_port }}"

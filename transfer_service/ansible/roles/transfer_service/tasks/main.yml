@@ -1,0 +1,18 @@
+---
+- name: "Deploy docker transfer_service"
+  become: true
+  docker_container:
+    name: "{{ transfer_service_docker_name }}"
+    hostname: "{{ transfer_service_docker_name }}"
+    state: "started"
+    image: "{{ transfer_service_docker_image }}"
+    ports:
+      - "{{ transfer_service_docker_ports }}"
+    log_driver: "json-file"
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    restart_policy: "always"
+    env:
+      TZ: "Europe/Moscow"
+      TRANSFER_PORT: "{{ transfer_service_port }}"

@@ -1,0 +1,72 @@
+---
+- name: "Create kafka and zookeeper dir"
+  become: true
+  file:
+    path: "{{ item }}"
+    mode: "u=rwX,g=rwX,o=rX"
+    state: "directory"
+  loop:
+    - "{{ kafka_server_dir }}"
+    - "{{ zookeeper_server_dir }}"
+
+- name: "Deploy kafka config"
+  become: true
+  template:
+    src: "server.properties.j2"
+    dest: "{{ kafka_server_dir }}/server.properties"
+    mode: "u=rw,g=rw,o="
+  register: deploy_kafka_config
+
+- name: "Deploy Zookeeper config"
+  become: true
+  template:
+    src: "zookeeper.properties.j2"
+    dest: "{{ zookeeper_server_dir }}/zookeeper.properties"
+    mode: "u=rw,g=rw,o="
+  register: deploy_zookeeper_config
+
+- name: "Deploy docker zookeeper"
+  become: true
+  docker_container:
+    name: "{{ zookeeper_docker_name }}"
+    hostname: "{{ zookeeper_docker_name }}"
+    state: "started"
+    restart: "{{ deploy_zookeeper_config['changed'] | bool }}"
+    image: "{{ zookeeper_docker_image }}"
+    volumes:
+      - "{{ zookeeper_server_dir }}:/opt/zookeeper"
+    ports:
+      - "{{ zookeeper_docker_ports }}"
+    log_driver: "json-file"
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    restart_policy: "always"
+    env:
+      TZ: "Europe/Moscow"
+
+- name: "Deploy docker kafka"
+  become: true
+  docker_container:
+    name: "{{ kafka_docker_name }}"
+    hostname: "{{ kafka_docker_name }}"
+    state: "started"
+    restart: "{{ deploy_kafka_config['changed'] | bool }}"
+    image: "{{ kafka_docker_image }}"
+    volumes:
+      - "{{ kafka_server_dir }}:/etc/kafka"
+    ports:
+      - "{{ kafka_docker_ports }}"
+    log_driver: "json-file"
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    restart_policy: "always"
+    env:
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_ZOOKEEPER_CONNECT: "172.17.0.1:{{ zookeeper_port }}"
+      KAFKA_ADVERTISED_LISTENERS: "{{ kafka_advertised_listeners }}"
+      KAFKA_LISTENERS: "{{ kafka_listeners }}"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "TEXT:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "TEXT"
+      TZ: "Europe/Moscow"

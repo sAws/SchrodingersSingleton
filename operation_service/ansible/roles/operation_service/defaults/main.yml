@@ -1,0 +1,5 @@
+---
+operation_service_docker_name: "devhack_operation_service"
+operation_service_docker_image: "{{ operation_service_registry }}/devhack-psb-schrodingerssingleton/operation_service:latest"
+operation_service_port: "10005"
+operation_service_docker_ports: "{{ operation_service_port }}:{{ operation_service_port }}"

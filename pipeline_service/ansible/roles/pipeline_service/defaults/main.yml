@@ -1,0 +1,5 @@
+---
+pipeline_service_docker_name: "devhack_pipeline_service"
+pipeline_service_docker_image: "{{ pipeline_service_registry }}/devhack-psb-schrodingerssingleton/pipeline_service:latest"
+pipeline_service_port: "10003"
+pipeline_service_docker_ports: "{{ pipeline_service_port }}:{{ pipeline_service_port }}"

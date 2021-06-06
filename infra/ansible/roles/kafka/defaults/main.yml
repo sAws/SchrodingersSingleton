@@ -1,0 +1,26 @@
+---
+# kafka docker
+kafka_docker_image: "wurstmeister/kafka:2.13-2.7.0"
+kafka_docker_name: "devhack_kafka"
+kafka_docker_ports: "{{ kafka_port }}:{{ kafka_port }}"
+
+# kafka dir
+kafka_server_dir: "/opt/devhack/kafka"
+
+# kafka settings
+kafka_port: "9092"
+
+kafka_listeners: "TEXT://0.0.0.0:{{ kafka_port }}"
+kafka_advertised_listeners: "TEXT://127.0.0.1:{{ kafka_port }}"
+kafka_listener_security_protocol_map: "TEXT:PLAINTEXT"
+
+# zookeeper docker
+zookeeper_docker_image: "wurstmeister/zookeeper:3.4.6"
+zookeeper_docker_name: "devhack_zookeeper"
+zookeeper_docker_ports: "{{ zookeeper_port }}:{{ zookeeper_port }}"
+
+# zookeeper dir
+zookeeper_server_dir: "/opt/devhack/zookeeper"
+
+# zookeeper settings
+zookeeper_port: "2181"

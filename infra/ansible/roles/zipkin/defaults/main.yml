@@ -1,0 +1,11 @@
+---
+# zipkin docker
+zipkin_docker_image: "openzipkin/zipkin:2.23.2"
+zipkin_docker_name: "devhack_zipkin"
+zipkin_docker_ports: "{{ zipkin_port }}:{{ zipkin_port }}"
+
+# zipkin dir
+zipkin_server_dir: "/opt/devhack/zipkin"
+
+# zipkin settings
+zipkin_port: "9411"

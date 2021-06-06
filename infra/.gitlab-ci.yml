@@ -1,0 +1,55 @@
+---
+stages:
+  - Deploy infra
+
+.extend-tags:
+  tags:
+    - devhack
+
+infra:kafka:
+  stage: Deploy infra
+  extends:
+    - .extend-tags
+  before_script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  after_script:
+    - docker logout ${CI_REGISTRY}
+  image: "${CI_REGISTRY}/middleware-analysis-platform\
+            /docker-images/gitlab-runner-executor:latest"
+  script:
+    - export ANSIBLE_CONFIG=${CI_PROJECT_DIR}/ansible.cfg
+    - ansible-playbook ansible/kafka.yml
+      -i "${ANSIBLE_INVENTORY_HOSTNAME},"
+      --extra-vars "{\"ansible_user\":\"${ANSIBLE_SSH_USER}\",\"ansible_password\":\"${ANSIBLE_SSH_PASSWORD}\",\"ansible_port\":\"${ANSIBLE_SSH_PORT}\"}"
+
+infra:mongodb:
+  stage: Deploy infra
+  extends:
+    - .extend-tags
+  before_script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  after_script:
+    - docker logout ${CI_REGISTRY}
+  image: "${CI_REGISTRY}/middleware-analysis-platform\
+            /docker-images/gitlab-runner-executor:latest"
+  script:
+    - export ANSIBLE_CONFIG=${CI_PROJECT_DIR}/ansible.cfg
+    - ansible-playbook ansible/mongodb.yml
+      -i "${ANSIBLE_INVENTORY_HOSTNAME},"
+      --extra-vars "{\"ansible_user\":\"${ANSIBLE_SSH_USER}\",\"ansible_password\":\"${ANSIBLE_SSH_PASSWORD}\",\"ansible_port\":\"${ANSIBLE_SSH_PORT}\"}"
+
+infra:zipkin:
+  stage: Deploy infra
+  extends:
+    - .extend-tags
+  before_script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  after_script:
+    - docker logout ${CI_REGISTRY}
+  image: "${CI_REGISTRY}/middleware-analysis-platform\
+            /docker-images/gitlab-runner-executor:latest"
+  script:
+    - export ANSIBLE_CONFIG=${CI_PROJECT_DIR}/ansible.cfg
+    - ansible-playbook ansible/zipkin.yml
+      -i "${ANSIBLE_INVENTORY_HOSTNAME},"
+      --extra-vars "{\"ansible_user\":\"${ANSIBLE_SSH_USER}\",\"ansible_password\":\"${ANSIBLE_SSH_PASSWORD}\",\"ansible_port\":\"${ANSIBLE_SSH_PORT}\"}"

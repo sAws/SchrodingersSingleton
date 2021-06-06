@@ -1,0 +1,5 @@
+---
+transfer_service_docker_name: "devhack_transfer_service"
+transfer_service_docker_image: "{{ transfer_service_registry }}/devhack-psb-schrodingerssingleton/transfer_service:latest"
+transfer_service_port: "10004"
+transfer_service_docker_ports: "{{ transfer_service_port }}:{{ transfer_service_port }}"

@@ -1,0 +1,18 @@
+---
+- name: "Deploy docker operation_service"
+  become: true
+  docker_container:
+    name: "{{ operation_service_docker_name }}"
+    hostname: "{{ operation_service_docker_name }}"
+    state: "started"
+    image: "{{ operation_service_docker_image }}"
+    ports:
+      - "{{ operation_service_docker_ports }}"
+    log_driver: "json-file"
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    restart_policy: "always"
+    env:
+      TZ: "Europe/Moscow"
+      OPERATION_PORT: "{{ operation_service_port }}"

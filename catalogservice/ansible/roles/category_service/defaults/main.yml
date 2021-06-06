@@ -1,0 +1,5 @@
+---
+category_service_docker_name: "devhack_category_service"
+category_service_docker_image: "{{ category_service_registry }}/devhack-psb-schrodingerssingleton/catalogservice:latest"
+category_service_port: "10002"
+category_service_docker_ports: "{{ category_service_port }}:{{ category_service_port }}"

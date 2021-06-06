@@ -1,0 +1,18 @@
+---
+- name: "Deploy docker account_service"
+  become: true
+  docker_container:
+    name: "{{ account_service_docker_name }}"
+    hostname: "{{ account_service_docker_name }}"
+    state: "started"
+    image: "{{ account_service_docker_image }}"
+    ports:
+      - "{{ account_service_docker_ports }}"
+    log_driver: "json-file"
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    restart_policy: "always"
+    env:
+      TZ: "Europe/Moscow"
+      ACCOUNT_PORT: "{{ account_service_port }}"

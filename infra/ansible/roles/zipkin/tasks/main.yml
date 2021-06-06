@@ -1,0 +1,24 @@
+---
+- name: "Create zipkin"
+  become: true
+  file:
+    path: "{{ zipkin_server_dir }}"
+    mode: "u=rwX,g=rwX,o=rX"
+    state: "directory"
+
+- name: "Deploy docker zipkin"
+  become: true
+  docker_container:
+    name: "{{ zipkin_docker_name }}"
+    hostname: "{{ zipkin_docker_name }}"
+    state: "started"
+    image: "{{ zipkin_docker_image }}"
+    ports:
+      - "{{ zipkin_docker_ports }}"
+    log_driver: "json-file"
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    restart_policy: "always"
+    env:
+      TZ: "Europe/Moscow"

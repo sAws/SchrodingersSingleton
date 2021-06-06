@@ -1,0 +1,5 @@
+---
+gateway_docker_name: "devhack_gateway"
+gateway_docker_image: "{{ gateway_registry }}/devhack-psb-schrodingerssingleton/gateway:latest"
+gateway_port: "10001"
+gateway_docker_ports: "{{ gateway_port }}:{{ gateway_port }}"

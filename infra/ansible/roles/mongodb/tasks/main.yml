@@ -1,0 +1,47 @@
+---
+- name: "Create mongodb dir"
+  become: true
+  file:
+    path: "{{ item }}"
+    mode: "u=rwX,g=rwX,o=rX"
+    state: "directory"
+  loop:
+    - "{{ mongodb_server_dir }}"
+    - "{{ mongodb_server_data_dir }}"
+
+- name: "Copy init.js file from template"
+  become: true
+  template:
+    src: "init.js.j2"
+    dest: "{{ mongodb_server_dir }}/init.js"
+    mode: "u=rw,g=rw,o="
+  register: deploy_mongodb_config
+
+- name: "Deploy docker mongodb"
+  become: true
+  docker_container:
+    name: "{{ mongodb_docker_name }}"
+    hostname: "{{ mongodb_docker_name }}"
+    state: "started"
+    restart: "{{ deploy_mongodb_config['changed'] | bool }}"
+    image: "{{ mongodb_docker_image }}"
+    volumes:
+      - "{{ mongodb_server_dir }}/init.js:/opt/init.js:ro"
+      - "{{ mongodb_server_data_dir }}:/data/db"
+    ports:
+      - "{{ mongodb_docker_ports }}"
+    log_driver: "json-file"
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    restart_policy: "always"
+    env:
+      TZ: "Europe/Moscow"
+      MONGO_INITDB_DATABASE: "admin"
+
+- name: "Run MongoDB init.js script"
+  become: true
+  shell: >-
+    docker exec {{ mongodb_docker_name }}
+    mongo --host 127.0.0.1 --port {{ mongodb_port }}
+    --eval "load('/opt/init.js')"

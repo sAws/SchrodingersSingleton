@@ -1,0 +1,22 @@
+---
+# mongodb docker
+mongodb_docker_image: "mongo:4.4.6-bionic"
+mongodb_docker_name: "devhack_mongodb"
+mongodb_docker_ports: "{{ mongodb_port }}:{{ mongodb_port }}"
+
+# mongodb dir
+mongodb_server_dir: "/opt/devhack/mongodb"
+mongodb_server_data_dir: "/opt/devhack/mongodb/data"
+
+# mongodb settings
+mongodb_port: "27017"
+
+mongodb_admin_username: "mongodbadmin"
+mongodb_admin_password: "mongodbadmin"
+mongodb_services:
+  - database: "OperationService"
+    user: "operationservice"
+    password: "operationservice"
+  - database: "TransferService"
+    user: "transferservice"
+    password: "transferservice"

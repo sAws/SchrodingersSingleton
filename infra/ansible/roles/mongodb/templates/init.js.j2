@@ -1,0 +1,32 @@
+// admin
+if (db.runCommand({ usersInfo: { user: "{{ mongodb_admin_username }}", db: "admin" } }).users.length != 1) {
+  admindb = db.getSiblingDB('admin');
+  admindb.createUser({
+    "user": "{{ mongodb_admin_username }}",
+    "pwd": "{{ mongodb_admin_password }}",
+    "roles": [
+      { role: "userAdminAnyDatabase", db: "admin" },
+      { role: "readWriteAnyDatabase", db: "admin" },
+      { role: "dbAdminAnyDatabase", db: "admin" },
+      { role: "clusterAdmin", db: "admin" }
+    ]
+  });
+  admindb.auth("{{ mongodb_admin_username }}", "{{ mongodb_admin_password }}");
+}
+
+// user
+{% for value in mongodb_services %}
+if (db.runCommand({ usersInfo: { user: "{{ value.user }}", db: "{{ value.database }}" } }).users.length != 1) {
+  userdb = db.getSiblingDB("{{ value.database }}");
+  userdb.createUser({
+    "user": "{{ value.user }}",
+    "pwd" : "{{ value.password }}",
+    "roles": [
+      { "role" : "readWrite", "db" : "{{ value.database }}"}
+    ],
+    "mechanisms": [ "SCRAM-SHA-1" ],
+    "passwordDigestor": "client"
+  });
+  userdb.auth("{{ value.user }}", "{{ value.password }}");
+}
+{% endfor %}

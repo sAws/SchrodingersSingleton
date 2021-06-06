@@ -1,0 +1,5 @@
+---
+account_service_docker_name: "devhack_account_service"
+account_service_docker_image: "{{ account_service_registry }}/devhack-psb-schrodingerssingleton/account_service:latest"
+account_service_port: "10006"
+account_service_docker_ports: "{{ account_service_port }}:{{ account_service_port }}"

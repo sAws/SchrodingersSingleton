@@ -1,0 +1,24 @@
+broker.id=1
+num.network.threads=3
+num.io.threads=8
+socket.send.buffer.bytes=102400
+socket.receive.buffer.bytes=102400
+socket.request.max.bytes=104857600
+log.dirs=/var/log/kafka/logs
+num.partitions=1
+num.recovery.threads.per.data.dir=1
+offsets.topic.replication.factor=1
+transaction.state.log.replication.factor=1
+transaction.state.log.min.isr=1
+log.retention.hours=168
+log.segment.bytes=1073741824
+log.retention.check.interval.ms=300000
+zookeeper.connection.timeout.ms=18000
+group.initial.rebalance.delay.ms=0
+inter.broker.listener.name=TEXT
+
+#listeners={{ kafka_listeners }}
+#advertised.listeners={{ kafka_advertised_listeners }}
+#listener.security.protocol.map={{ kafka_listener_security_protocol_map }}
+#zookeeper.connect=172.17.0.1:{{ zookeeper_port }}
+#auto.create.topics.enable=true

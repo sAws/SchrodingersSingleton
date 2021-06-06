@@ -1,0 +1,63 @@
+---
+.extend-tags:
+  tags:
+    - devhack
+
+stages:
+  - Java package native
+  - Java native docker
+  - Deploy
+
+java-native:
+  stage: Java package native
+  extends:
+    - .extend-tags
+  image: "maven:3.6.3-openjdk-11-slim"
+  script:
+    - apt-get update -qq
+    - apt-get install -y -qq build-essential libz-dev zlib1g-dev
+    - echo "Downloading GraalVM"
+    - curl -L https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-21.1.0/graalvm-ce-java11-linux-amd64-21.1.0.tar.gz > graalvm-ce-java11-linux-amd64-21.1.0.tar.gz
+    - tar -zxf graalvm-ce-java11-linux-amd64-21.1.0.tar.gz -C ${CI_PROJECT_DIR}/
+    - ls -lah
+    - echo "Installing GraalVM via gu"
+    - ${CI_PROJECT_DIR}/graalvm-ce-java11-21.1.0/bin/gu install native-image
+    - export GRAALVM_HOME=${CI_PROJECT_DIR}/graalvm-ce-java11-21.1.0
+    - ./mvnw clean package -Pnative -DskipTests
+    - ls -lah target/
+  artifacts:
+    paths:
+      - target/account_service-1.0.0-SNAPSHOT-runner
+    expire_in: 60 minutes
+
+java-docker:
+  stage: Java native docker
+  extends:
+    - .extend-tags
+  image: docker:dind
+  before_script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  after_script:
+    - docker logout ${CI_REGISTRY}
+  script:
+    - ls -lah target/account_service-1.0.0-SNAPSHOT-runner
+    - docker build -f Dockerfile -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:8} .
+    - docker tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:8} ${CI_REGISTRY_IMAGE}:latest
+    - docker push ${CI_REGISTRY_IMAGE}:latest
+
+java-deploy:
+  stage: Deploy
+  extends:
+    - .extend-tags
+  before_script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  after_script:
+    - docker logout ${CI_REGISTRY}
+  image: "${CI_REGISTRY}/middleware-analysis-platform/map-deployer:latest"
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
+    GIT_STRATEGY: none
+  script:
+    - ansible-playbook ansible/run.yml
+      -i "${ANSIBLE_INVENTORY_HOSTNAME},"
+      --extra-vars "{\"ansible_user\":\"${ANSIBLE_SSH_USER}\",\"ansible_password\":\"${ANSIBLE_SSH_PASSWORD}\",\"ansible_port\":\"${ANSIBLE_SSH_PORT}\",\"account_service_registry\":\"${CI_REGISTRY}\"}"
