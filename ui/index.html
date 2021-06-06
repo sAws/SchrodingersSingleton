@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<meta charset=utf-8>
+<body>
+
+<div id="form">
+</div>
+
+<script>
+
+let formJSON = '{"id":"uuid","entity":"transfer","elements":[{"header":{}},{"id":"credit_application_title","title":"Заявка на кредит","type":"text"},{"id":"credit_application_value","title":"Объем кредита в рублях","type":"input","input":{"type":"value","data_type":"integer","data_measumerment":"rur"},"required":true},{"footer":{"buttons":[{"name":"Следующий этап","url":"/api/applyForm?operationTypeID=?","method":"POST"}]}}]}';
+
+function parseForm() {
+  let obj = JSON.parse(formJSON);
+    for (i in obj.elements) {
+      let el = obj.elements[i];
+      if (el.hasOwnProperty("header")) {
+        renderHeader(el.header);
+      } else if (el.hasOwnProperty("footer")) {
+        renderFooter(el.footer);
+      } else {
+        renderElement(el);
+      }
+    }
+} 
+
+function renderHeader(header) {}
+
+function renderFooter(footer) {
+ console.log(footer);
+ console.log(footer.buttons);
+ for (i in footer.buttons) {
+   console.log(i);
+   let btn = footer.buttons[i];
+   let createdEl = document.createElement("input");
+   createdEl.value = btn.name;
+   createdEl.type = "button";
+   createdEl.onclick = function() { 
+    alert("we can do request by url: " + btn.url);
+   };
+  var form = document.getElementById("form");
+  form.appendChild(document.createElement("br"));
+  form.appendChild(createdEl);
+ }
+}
+
+function renderElement(el) {
+  var form = document.getElementById("form");
+  
+  let elTitle = document.createElement("p");
+  elTitle.innerHTML = el.title;
+  form.appendChild(elTitle);
+  let createdEl = document.createElement(el.type);
+  createdEl.id = el.id;
+  createdEl.type = el.input;
+  createdEl.name = name;
+  createdEl.onclick = function() { 
+    alert("blabla");
+  };
+  form.appendChild(createdEl);
+}
+
+parseForm();
+
+</script>
+
+</body>
+</html>
